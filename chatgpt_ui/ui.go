@@ -1,4 +1,4 @@
-package chartgpt_ui
+package chatgpt_ui
 
 import (
 	"bytes"
@@ -30,7 +30,7 @@ type CompletionRequest struct {
 	FrequencyPenalty float32 `json:"frequency_penalty"`
 }
 
-func ChartGPTHttp(model string, completionRequest CompletionRequest) string {
+func ChatGPTHttp(model string, completionRequest CompletionRequest) string {
 	var completionResponse CompletionResponse
 	relativePath, _ := filepath.Abs("./cfg.json")
 	cfg, err := tools.LoadConfig(relativePath)
@@ -62,7 +62,7 @@ func ChartGPTHttp(model string, completionRequest CompletionRequest) string {
 
 }
 
-func ChartGPTUi() error {
+func ChatGPTUi() error {
 	var completion_request CompletionRequest
 	models := []string{"text-davinci-003", "code-davinci-002"}
 	err := ui.Main(func() {
@@ -100,7 +100,7 @@ func ChartGPTUi() error {
 			}
 		})
 
-		commitButton := ui.NewButton("提交")
+		commitButton := ui.NewButton("Submit")
 		commitButton.OnClicked(func(*ui.Button) {
 			completion_request.Prompt = prompt.Text()
 			completion_request.MaxTokens = tools.StringToInt(max_tokens.Text())
@@ -110,7 +110,7 @@ func ChartGPTUi() error {
 			completion_request.FrequencyPenalty = tools.StringToFloat32(frequency_penalty.Text())
 			resultCh := make(chan string)
 			go func() {
-				resultCh <- ChartGPTHttp(models[model.Selected()], completion_request)
+				resultCh <- ChatGPTHttp(models[model.Selected()], completion_request)
 			}()
 			select {
 			case result := <-resultCh:
@@ -119,26 +119,26 @@ func ChartGPTUi() error {
 
 		})
 
-		promptGroup := tools.MyGroup("请输入需要获取的内容", prompt)
-		maxTokensGroup := tools.MyGroup("设置返回信息的最大长度：0~4000", max_tokens)
-		temperatureGroup := tools.MyGroup("随机性：0.0~0.9", temperature)
-		topPGroup := tools.MyGroup("top_p：0.1~1.0", top_p)
-		presencePenaltyGroup := tools.MyGroup("控制主题的重复度：-2.0~2.0", presence_penalty)
-		frequencyPenaltyGroup := tools.MyGroup("控制字符的重复度：-2.0~2.0", frequency_penalty)
+		promptGroup := tools.MyGroup("Prompt", prompt)
+		maxTokensGroup := tools.MyGroup("MaxTokens：0~4000", max_tokens)
+		temperatureGroup := tools.MyGroup("Temperature：0.0~0.9", temperature)
+		topPGroup := tools.MyGroup("TopP：0.1~1.0", top_p)
+		presencePenaltyGroup := tools.MyGroup("PresencePenalty：-2.0~2.0", presence_penalty)
+		frequencyPenaltyGroup := tools.MyGroup("FrequencyPenalty：-2.0~2.0", frequency_penalty)
 
-		buttonGroup := ui.NewGroup("提交请求参数")
+		buttonGroup := ui.NewGroup("Submit request parameters")
 		buttonGroup.SetChild(commitButton)
 
-		copyGroup := ui.NewGroup("拷贝ChartGPT返回的结果")
+		copyGroup := ui.NewGroup("Copy the result of ChatGPT")
 		copyGroup.SetChild(copyButton)
 
-		parseGroup := ui.NewGroup("复制需要查询的内容")
+		parseGroup := ui.NewGroup("Paste the query")
 		parseGroup.SetChild(parseButton)
 
-		modelGroup := ui.NewGroup("选择模型")
+		modelGroup := ui.NewGroup("Models")
 		modelGroup.SetChild(model)
 
-		resultGroup := ui.NewGroup("ChartGPT返回信息")
+		resultGroup := ui.NewGroup("ChatGPT response")
 		resultGroup.SetChild(http_result_txt)
 
 		verticalBox := ui.NewVerticalBox()
@@ -173,7 +173,7 @@ func ChartGPTUi() error {
 		verticalBox.Append(resultBox, false)
 		verticalBox.SetPadded(false)
 
-		window := ui.NewWindow("ChartGPT", 600, 600, false)
+		window := ui.NewWindow("ChatGPT", 600, 600, false)
 		window.SetChild(verticalBox)
 		window.SetMargined(true)
 		window.OnClosing(func(*ui.Window) bool {

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"chargpt_ui/chartgpt_ui"
+	"chargpt_ui/chatgpt_ui"
 	"fmt"
 )
 
 func main() {
-	err := chartgpt_ui.ChartGPTUi()
+	err := chatgpt_ui.ChatGPTUi()
 	fmt.Println("err: ", err)
 }
