@@ -72,7 +72,7 @@ func ChartGPTUi() error {
 		top_p := tools.MyEntry("1.0")
 		presence_penalty := tools.MyEntry("0.0")
 		frequency_penalty := tools.MyEntry("0.0")
-		http_result_txt := tools.MyEntry("")
+		http_result_txt := ui.NewLabel("")
 
 		model := ui.NewRadioButtons()
 		model.Append(models[0])
