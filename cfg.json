@@ -1,4 +1,5 @@
 {
   "ApiKey": "YOUR_API_KEY",
-  "HttpTimeOut": 120
+  "HttpTimeOut": 120,
+  "LogDir": "/Users/oliver/ChatGPT/chargpt.log"
 }
