@@ -30,13 +30,8 @@ type CompletionRequest struct {
 	FrequencyPenalty float32 `json:"frequency_penalty"`
 }
 
-func ChatGPTHttp(model string, completionRequest CompletionRequest) string {
+func ChatGPTHttp(model string, completionRequest CompletionRequest, cfg *tools.Config) string {
 	var completionResponse CompletionResponse
-	relativePath, _ := filepath.Abs("./cfg.json")
-	cfg, err := tools.LoadConfig(relativePath)
-	if err != nil {
-		panic(err)
-	}
 	requestBody, _ := json.Marshal(completionRequest)
 	url := fmt.Sprintf("https://api.openai.com/v1/engines/%s/completions", model)
 	apiKey := fmt.Sprintf("Bearer %s", cfg.ApiKey)
@@ -54,7 +49,7 @@ func ChatGPTHttp(model string, completionRequest CompletionRequest) string {
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
 
-	err = json.Unmarshal(body, &completionResponse)
+	err := json.Unmarshal(body, &completionResponse)
 	if err != nil {
 		return "json decode failed"
 	}
@@ -64,9 +59,14 @@ func ChatGPTHttp(model string, completionRequest CompletionRequest) string {
 
 func ChatGPTUi() error {
 	var completion_request CompletionRequest
-	logger, _ := tools.NewLogger("./chatgpt.log")
+	relativePath, _ := filepath.Abs("./cfg.json")
+	cfg, err := tools.LoadConfig(relativePath)
+	if err != nil {
+		panic(err)
+	}
+	logger, _ := tools.NewLogger(cfg.LogDir)
 	models := []string{"text-davinci-003", "code-davinci-002"}
-	err := ui.Main(func() {
+	err = ui.Main(func() {
 		prompt := tools.MyEntry("")
 		max_tokens := tools.MyEntry("4000")
 		temperature := tools.MyEntry("0.9")
@@ -93,7 +93,7 @@ func ChatGPTUi() error {
 			text := http_result_txt.Text()
 			cmd := exec.Command("pbcopy")
 			in, _ := cmd.StdinPipe()
-			_, err := in.Write([]byte(text))
+			_, err = in.Write([]byte(text))
 			err = in.Close()
 			err = cmd.Run()
 			if err != nil {
@@ -112,7 +112,7 @@ func ChatGPTUi() error {
 			completion_request.FrequencyPenalty = tools.StringToFloat32(frequency_penalty.Text())
 			resultCh := make(chan string)
 			go func() {
-				resultCh <- ChatGPTHttp(models[model.Selected()], completion_request)
+				resultCh <- ChatGPTHttp(models[model.Selected()], completion_request, cfg)
 			}()
 			select {
 			case result := <-resultCh:

@@ -11,6 +11,7 @@ import (
 type Config struct {
 	ApiKey      string `json:"ApiKey"`
 	HttpTimeOut int    `json:"HttpTimeOut"`
+	LogDir      string `json:"LogDir"`
 }
 
 func MyEntry(init string) *ui.Entry {
