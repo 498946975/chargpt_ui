@@ -64,6 +64,7 @@ func ChatGPTHttp(model string, completionRequest CompletionRequest) string {
 
 func ChatGPTUi() error {
 	var completion_request CompletionRequest
+	logger, _ := tools.NewLogger("./chatgpt.log")
 	models := []string{"text-davinci-003", "code-davinci-002"}
 	err := ui.Main(func() {
 		prompt := tools.MyEntry("")
@@ -103,6 +104,7 @@ func ChatGPTUi() error {
 		commitButton := ui.NewButton("Submit")
 		commitButton.OnClicked(func(*ui.Button) {
 			completion_request.Prompt = prompt.Text()
+			logger.Log("INFO", prompt.Text())
 			completion_request.MaxTokens = tools.StringToInt(max_tokens.Text())
 			completion_request.Temperature = tools.StringToFloat32(temperature.Text())
 			completion_request.TopP = tools.StringToFloat32(top_p.Text())
@@ -115,6 +117,7 @@ func ChatGPTUi() error {
 			select {
 			case result := <-resultCh:
 				http_result_txt.SetText(result)
+				logger.Log("WARNING", result)
 			}
 
 		})
